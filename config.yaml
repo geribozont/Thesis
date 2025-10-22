@@ -1,0 +1,27 @@
+learning_params:
+  learning_rate: 0.01
+  criterion: "BCELoss"
+  optimizer: "Adam"
+  num_of_epochs: 1000
+  batch_size: 64
+  weight_decay: 0.0001
+  momentum: 0.9
+  patience: 100
+  early_stopping_threshold: 0.001
+  scheduler: "StepLR"
+  step_size: 50
+  gamma: 0.5
+  device: "cuda"
+network:
+  input_size: 3
+  output_size: 1
+  hidden_layers: 2
+  layer_sizes: [4, 4]
+  activation: "softplus"
+  output_activation: "sigmoid"
+  use_bias: True
+quantization:
+  act_quant: "Int8ActPerTensorFixedPoint"
+  weight_quant: "Int8WeightPerTensorFixedPoint"
+  act_bit_width: 8
+  weight_bit_width: 8
