@@ -6,135 +6,119 @@
 #include <cmath>
 #include <iomanip>
 #include <queue>
-#include <unistd.h>    // getcwd()
-#include <limits.h>    // PATH_MAX
 
 using namespace std;
 
-int pwl_softplus_18(int x){
-    x += pow(2,17);
-    int interval = (x >> 13);
-    switch (interval){
-        case 0: return ((x * 4) >> 13) + 5;
-        case 1: return ((x * 6) >> 13) + 3;
-        case 2: return ((x * 10) >> 13) + -5;
-        case 3: return ((x * 16) >> 13) + -23;
-        case 4: return ((x * 26) >> 13) + -63;
-        case 5: return ((x * 43) >> 13) + -148;
-        case 6: return ((x * 71) >> 13) + -316;
-        case 7: return ((x * 116) >> 13) + -631;
-        case 8: return ((x * 190) >> 13) + -1223;
-        case 9: return ((x * 309) >> 13) + -2294;
-        case 10: return ((x * 497) >> 13) + -4174;
-        case 11: return ((x * 787) >> 13) + -7364;
-        case 12: return ((x * 1220) >> 13) + -12560;
-        case 13: return ((x * 1832) >> 13) + -20516;
-        case 14: return ((x * 2635) >> 13) + -31758;
-        case 15: return ((x * 3590) >> 13) + -46083;
-        case 16: return ((x * 4602) >> 13) + -62275;
-        case 17: return ((x * 5557) >> 13) + -78510;
-        case 18: return ((x * 6360) >> 13) + -92964;
-        case 19: return ((x * 6972) >> 13) + -104592;
-        case 20: return ((x * 7405) >> 13) + -113252;
-        case 21: return ((x * 7695) >> 13) + -119342;
-        case 22: return ((x * 7883) >> 13) + -123478;
-        case 23: return ((x * 8002) >> 13) + -126215;
-        case 24: return ((x * 8076) >> 13) + -127991;
-        case 25: return ((x * 8121) >> 13) + -129116;
-        case 26: return ((x * 8149) >> 13) + -129844;
-        case 27: return ((x * 8166) >> 13) + -130303;
-        case 28: return ((x * 8176) >> 13) + -130583;
-        case 29: return ((x * 8182) >> 13) + -130757;
-        case 30: return ((x * 8186) >> 13) + -130877;
-        case 31: return ((x * 8188) >> 13) + -130939;
-        default: return 255;
-    }    
+int act(int x, vector<pair<int, int>> act_vector, int scale, int bit_width){
+
+
+    //cout << endl;
+    //cout << "Acc" << endl;
+    //cout << "x: " << x << endl;
+    long long int k = x + pow(2,bit_width-1);
+    cout << "ez egy ká: " << k << endl;
+    x += pow(2,bit_width-1);
+    cout << "x: " << x << " scale " << scale << " bit width " << bit_width << endl;
+    cout << x << ' ' << pow(2,bit_width-1) - pow(2,scale+4-1) << ' ' << pow(2,bit_width-1) + pow(2,scale+4-1) << endl;
+    
+    int lower = (1 << (bit_width - 1)) - (1 << (scale + 3));
+    int upper = (1 << (bit_width - 1)) + (1 << (scale + 3));
+    
+    if (x < lower){
+        cout << "min" << endl;
+        return 0;
+    } else 
+    if (x > upper){
+        cout << "max" << endl;
+        return pow(2,scale);
+    }
+
+    int delta = 14 - scale;
+    int interval = x >> (14 - 1 - delta);
+    //interval = max(0, min((int)act_vector.size() - 1, interval));
+
+    cout << "Interval: " << interval << endl;
+    //cout << "log2x: " << log2(x) << endl;
+    cout << "res1 szorzas shift előtt: " << x << endl;
+    long long int res1 = x;
+    //cout << "res1 szorzas elott shift utan: " << res1 << " amivel szorzunk " << act_vector[interval].first << endl;
+    res1 *= act_vector[interval].first;
+    //cout << "res1 szorzas utan shift elott: " << res1 << endl;
+    res1 = res1 >> 14;
+    //cout << "res1 összeadás előtt: " << res1 << endl;
+    //cout << act_vector[interval].second << endl;
+    //cout << endl;
+    // 51491
+    return res1 + (act_vector[interval].second >> (delta));
 }
 
-int pwl_softplus_19(int x){
-    x += pow(2,18);
-    int interval = (x >> 14);
-    cout << "interval " << interval << endl;
-    switch (interval){
-        case 0: return ((x * 0) >> 11) + 0;
-        case 1: return ((x * 0) >> 11) + 0;
-        case 2: return ((x * 0) >> 11) + 0;
-        case 3: return ((x * 0) >> 11) + 0;
-        case 4: return ((x * 0) >> 11) + 0;
-        case 5: return ((x * 0) >> 11) + 0;
-        case 6: return ((x * 0) >> 11) + 0;
-        case 7: return ((x * 0) >> 11) + 0;
-        case 8: return ((x * 0) >> 11) + 0;
-        case 9: return ((x * 0) >> 11) + 0;
-        case 10: return ((x * 0) >> 11) + 0;
-        case 11: return ((x * 0) >> 11) + 0;
-        case 12: return ((x * 0) >> 11) + 0;
-        case 13: return ((x * 0) >> 11) + 0;
-        case 14: return ((x * 0) >> 11) + -14;
-        case 15: return ((x * 177) >> 11) + -21284;
-        case 16: return ((x * 1871) >> 11) + -238020;
-        case 17: return ((x * 2048) >> 11) + -262126;
-        case 18: return ((x * 2048) >> 11) + -262144;
-        case 19: return ((x * 2048) >> 11) + -262144;
-        case 20: return ((x * 2048) >> 11) + -262144;
-        case 21: return ((x * 2048) >> 11) + -262144;
-        case 22: return ((x * 2048) >> 11) + -262144;
-        case 23: return ((x * 2048) >> 11) + -262144;
-        case 24: return ((x * 2048) >> 11) + -262144;
-        case 25: return ((x * 2048) >> 11) + -262144;
-        case 26: return ((x * 2048) >> 11) + -262144;
-        case 27: return ((x * 2048) >> 11) + -262144;
-        case 28: return ((x * 2048) >> 11) + -262144;
-        case 29: return ((x * 2048) >> 11) + -262144;
-        case 30: return ((x * 2048) >> 11) + -262144;
-        case 31: return ((x * 2048) >> 11) + -262144;
-        default: return 255;
-    }    
+int max_szam = 0;
+
+int act2(int x, vector<pair<int, int>> act_vector, int scale, int bit_width){
+
+    int default_scale = 14;
+
+    long long xx = x;
+    // terv: 
+    // elágazás ha
+    // x < kritikus szakasz alsó határa  -> minimum
+    // x > kritikus szakasz felső határa -> maximum
+    // egyébként tolunk és kizárólag a scaling faktorral dolgozunk
+
+    if (xx < -(1 << (scale + 3))){
+        return 0;
+    } else 
+    if (xx > (1 << (scale + 3))){
+        return 999999;
+    }
+    cout << "x: " << xx << endl;
+    xx += pow(2, scale+3);
+    cout << "scale: " << scale << " bit width: " << bit_width << endl;
+    cout << "x: " << xx << endl;
+    int delta = default_scale - scale;
+    int interval = xx >> default_scale - delta - 1;
+    cout << "interval: " << interval << " delta " << delta << endl;
+    xx = xx >> 8 - delta;
+    
+    xx = xx * act_vector[interval].first;
+
+    if (xx > max_szam) max_szam = xx;
+
+    cout << "szorzas utan: " << xx << endl;
+    xx = xx >> 6 + delta;
+    cout << "shift után:" << xx << endl;
+    cout << "amit kivonunk: " << (act_vector[interval].second >> delta) << endl;
+    xx += act_vector[interval].second >> delta;
+    cout << "eredmeny: " << xx << endl;
+
+    return xx;
 }
 
-int pwl_sigmoid(int x){
-    x += pow(2,18);
-    int interval = x >> 14;
-    cout << "interval " << interval << endl;
-    switch (interval){
-        case 0: return ((x * 0) >> 14) + 0;
-        case 1: return ((x * 0) >> 14) + 0;
-        case 2: return ((x * 0) >> 14) + 0;
-        case 3: return ((x * 0) >> 14) + 0;
-        case 4: return ((x * 0) >> 14) + 0;
-        case 5: return ((x * 0) >> 14) + 0;
-        case 6: return ((x * 0) >> 14) + 0;
-        case 7: return ((x * 0) >> 14) + 0;
-        case 8: return ((x * 0) >> 14) + 0;
-        case 9: return ((x * 0) >> 14) + 0;
-        case 10: return ((x * 0) >> 14) + 0;
-        case 11: return ((x * 0) >> 14) + 0;
-        case 12: return ((x * 0) >> 14) + 0;
-        case 13: return ((x * 0) >> 14) + 0;
-        case 14: return ((x * 0) >> 14) + 0;
-        case 15: return ((x * 512) >> 14) + -7680;
-        case 16: return ((x * 512) >> 14) + -7680;
-        case 17: return ((x * 0) >> 14) + 1024;
-        case 18: return ((x * 0) >> 14) + 1024;
-        case 19: return ((x * 0) >> 14) + 1024;
-        case 20: return ((x * 0) >> 14) + 1024;
-        case 21: return ((x * 0) >> 14) + 1024;
-        case 22: return ((x * 0) >> 14) + 1024;
-        case 23: return ((x * 0) >> 14) + 1024;
-        case 24: return ((x * 0) >> 14) + 1024;
-        case 25: return ((x * 0) >> 14) + 1024;
-        case 26: return ((x * 0) >> 14) + 1024;
-        case 27: return ((x * 0) >> 14) + 1024;
-        case 28: return ((x * 0) >> 14) + 1024;
-        case 29: return ((x * 0) >> 14) + 1024;
-        case 30: return ((x * 0) >> 14) + 1024;
-        case 31: return ((x * 0) >> 14) + 1024;
-        default: return 255;
-    }    
+
+vector<pair<int, int>> readAct(const string& filename) {
+    vector<pair<int, int>> data;
+    ifstream file(filename);
+    string line;
+    
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+        
+        stringstream ss(line);
+        string a_str, b_str;
+        
+        getline(ss, a_str, ',');
+        getline(ss, b_str);
+        
+        int a = stoi(a_str);
+        int b = stoi(b_str);
+        
+        data.push_back({a, b});
+    }
+    
+    return data;
 }
 
 queue<int> read_file(string filename){
-
 
     queue<int> numbers;
     
@@ -168,6 +152,9 @@ int main(){
     queue<int> biases = read_file("brevitas_conf_params_bias.txt");
     queue<int> weight_scales = read_file("brevitas_conf_params_weight_scale.txt");
     queue<int> bias_scales = read_file("brevitas_conf_params_bias_scale.txt");
+    vector<pair<int,int>> sigmoid_default = readAct("segments_4_my_sigmoid.txt");
+    vector<pair<int,int>> softplus_default = readAct("segments_4_my_softplus.txt");
+    vector<pair<int,int>> tanh_default = readAct("segments_4_my_tanh.txt");
 
     // data open
 
@@ -200,12 +187,13 @@ int main(){
 
 
     vector<vector<int>> input_test;
-    for (size_t i = 0; i < 1; ++i) {
+    for (size_t i = 0; i < 1000; ++i) {
         input_test.push_back(inputs[i]);
     }
 
     vector<int> layer1out;
     vector<int> layer2out;
+
     for (vector<int> inp : input_test) {
         vector<int> layer1out;
         vector<int> msb;
@@ -214,6 +202,8 @@ int main(){
         for(int i : inp) cout << i << ' ';
         cout << endl;
         int max_msb = 0;
+        
+        int bit_width = 18;
 
         for (int i = 0; i < 4; i++) {
             int acc = 0;
@@ -222,20 +212,19 @@ int main(){
                 int w = weights.front(); weights.pop();
                 acc += w * inp[j]; 
                 weights.push(w);
-                //cout << w << " = " << inp[j] << '*' << w << " + ";
+                cout << acc << " +=" << w << " * " << inp[j] << endl;
             }
-            //cout << endl;
-            //cout << "Before acc & bias: " << acc << ' ' << endl;
+            cout << endl;
+            cout << "Before acc & bias: " << acc << ' ' << endl;
             int bias = biases.front(); biases.pop(); biases.push(bias);
             bias = (bias << (weight_scales.front() + 8 - bias_scales.front())); // 8 a weight scale miatt
             acc += bias;
-            //cout << "After bias, before acc: " << acc << ' ' << endl;
-            acc = pwl_softplus_18(acc);
+            cout << "After bias, before acc: " << acc << ' ' << endl;
+            acc = act2(acc, softplus_default, weight_scales.front() + 8, bit_width);
             layer1out.push_back(acc);
-            cout << acc << endl;
-            //cout << "Afret acc & bias: "<< acc << ' ' << endl;
+            cout << "Afret acc & bias: "<< acc << ' ' << endl;
             msb.push_back(log2(abs(acc)));
-            //cout << "MSB: " << msb.back() << endl;
+            cout << "MSB: " << msb.back() << endl;
             if (log2(abs(acc)) > max_msb) max_msb = log2(abs(acc));
             cout << "Max msb:" << max_msb << endl;
         }
@@ -253,14 +242,18 @@ int main(){
         cout << endl;
 
         // layer 2
-        
+
+        cout << "#################################################################################################################################################" << endl;
+        cout << endl;
         max_msb = 0;
+        bit_width = 19;
+
         for (int i = 0; i < 4; i++) {
             int acc = 0;
             for (int j = 0; j < 4; j++) {
                 // cout << inp[j] << ' ';
                 int w = weights.front(); weights.pop();
-                cout <<  layer1out[j] << endl;
+                cout << "layer1out " << layer1out[j] << " weight " << w << endl;
                 acc += w * layer1out[j]; 
                 weights.push(w);
                 //cout << w << " = " << inp[j] << '*' << w << " + ";
@@ -271,7 +264,7 @@ int main(){
             bias = (bias << (weight_scales.front() + scf_out - bias_scales.front()));
             acc += bias;
             cout << "After bias, before acc: " << acc << ' ' << endl;
-            acc = pwl_softplus_19(acc);
+            acc = act2(acc, softplus_default, weight_scales.front() + scf_out, bit_width);
             layer2out.push_back(acc);
             cout << "Afret acc & bias: "<< acc << ' ' << endl;
             msb.push_back(log2(acc));
@@ -290,6 +283,9 @@ int main(){
         cout << endl;
 
         // layer 3
+
+        cout << "#################################################################################################################################################" << endl;
+        cout << endl;
 
         cout << "output layer" << endl;
 
@@ -310,12 +306,12 @@ int main(){
             bias = (bias << (weight_scales.front() + scf_out - bias_scales.front()));
             acc += bias;
             cout << "After bias, before acc: " << acc << ' ' << endl;
-            acc = pwl_sigmoid(acc);
+            acc = act(acc, sigmoid_default, weight_scales.front() + scf_out, bit_width);
             layer2out.push_back(acc);
             cout << "Afret acc & bias: "<< acc << ' ' << endl;
         }
     }
     
-    cout  << "FINITO" << endl;
+    cout  << "FINITO, de a max szam: " << max_szam << endl;
     return 0;
 }
